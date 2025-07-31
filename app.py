@@ -12,12 +12,15 @@ from flask_mail import Mail, Message
 from itsdangerous import URLSafeTimedSerializer
 from flask_mail import Message
 from flask import render_template_string
+import psycopg2
+
+
 
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'your-secret-key-here'
-app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('postgresql://jntu_db_user:40OU1X3HaYcu6UU9ak0nMnLZA7LUPb7z@dpg-d2366kre5dus73aagg8g-a.singapore-postgres.render.com/jntu_db
-')
+app.config['SECRET_KEY'] = 'b42322dc0dd4c65d5ef1752d117cce2f'
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL')
+
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['UPLOAD_FOLDER'] = 'static/uploads'
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
