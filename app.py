@@ -12,6 +12,8 @@ from flask_mail import Mail, Message
 from itsdangerous import URLSafeTimedSerializer
 from flask_mail import Message
 from flask import render_template_string
+import psycopg
+
 
 
 app = Flask(__name__)
