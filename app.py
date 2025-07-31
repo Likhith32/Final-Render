@@ -15,7 +15,7 @@ from flask import render_template_string
 
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'your-secret-key-here'
+app.config['SECRET_KEY'] = 'b42322dc0dd4c65d5ef1752d117cce2f'
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('postgresql://jntu_db_user:40OU1X3HaYcu6UU9ak0nMnLZA7LUPb7z@dpg-d2366kre5dus73aagg8g-a.singapore-postgres.render.com/jntu_db
 ')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
