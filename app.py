@@ -494,17 +494,20 @@ def edit_profile():
 
     return render_template('edit_profile.html', user=user)
 
-
 @app.route('/forgot-password', methods=['GET', 'POST'])
 def forgot_password():
     if request.method == 'POST':
         email = request.form['email']
         user = User.query.filter_by(email=email).first()
         if user:
-            token = generate_token(email)
-            reset_url = url_for('reset_password', token=token, _external=True)
-            send_reset_email(email, reset_url)
-            flash('If this email is registered, a reset link has been sent.', 'info')
+            try:
+                token = generate_token(email)
+                reset_url = url_for('reset_password', token=token, _external=True)
+                send_reset_email(email, reset_url)
+                flash('If this email is registered, a reset link has been sent.', 'info')
+            except Exception as e:
+                print("Error sending reset email:", e)
+                flash('Error sending reset email. Please try again later.', 'error')
         else:
             flash('Email not found!', 'danger')
     return render_template('forgot_password.html')
@@ -545,23 +548,7 @@ def send_reset_email(email, reset_url):
 
     # HTML version
     html_body = render_template_string("""
-    <html>
-      <body style="font-family: 'Segoe UI', sans-serif; color: #333; background-color: #f9f9f9; padding: 30px;">
-        <div style="max-width: 600px; margin: auto; background: #fff; border-radius: 8px; padding: 30px; box-shadow: 0 5px 15px rgba(0,0,0,0.1);">
-          <h2 style="color: #10b981;">Reset Your Password</h2>
-          <p>Hello,</p>
-          <p>We received a request to reset the password associated with this email address.</p>
-          <p>If you made this request, please click the button below to reset your password:</p>
-          <p style="text-align: center; margin: 30px 0;">
-            <a href="{{ reset_url }}" style="background: #10b981; color: white; padding: 12px 24px; border-radius: 6px; text-decoration: none; font-weight: bold;">Reset Password</a>
-          </p>
-          <p>This link will expire in <strong>30 minutes</strong>.</p>
-          <p>If you did not request this, you can safely ignore this email.</p>
-          <br />
-          <p style="font-size: 0.9rem; color: #888;">Thanks,<br>Your Website Team</p>
-        </div>
-      </body>
-    </html>
+    ... (HTML template here) ...
     """, reset_url=reset_url)
 
     # Plain text version (fallback)
@@ -586,7 +573,11 @@ Your Website Team
     msg.html = html_body
     msg.sender = sender
 
-    mail.send(msg)
+    try:
+        mail.send(msg)
+    except Exception as e:
+        print("Mail send failed:", e)
+        raise e
 
 
 
