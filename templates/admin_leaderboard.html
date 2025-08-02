@@ -85,10 +85,10 @@
           {% for e in entry.entries %}
             <tr style="background-color: {{ '#f9fbfd' if loop.index is odd else '#e8f0fe' }};">
               <td class="{% if e.rank == 1 %}rank-1{% elif e.rank == 2 %}rank-2{% elif e.rank == 3 %}rank-3{% else %}rank-default{% endif %}">{{ e.rank }}</td>
-              <td style="text-align: left;">{{ e.user.name }}</td>
-              <td style="text-align: left;">{{ e.user.roll_no }}</td>
+              <td style="text-align: left;">{{ e.name }}</td>
+              <td style="text-align: left;">{{ e.roll_number }}</td>
               <td style="color:#27ae60; font-weight: 600;">{{ e.score }}</td>
-              <td style="color:#7f8c8d;">{{ e.completed_at.strftime('%d-%m-%Y %H:%M') }}</td>
+              <td style="color:#7f8c8d;">{{ e.completed_at }}</td>
             </tr>
           {% endfor %}
         </tbody>
