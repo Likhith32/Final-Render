@@ -193,42 +193,66 @@ def admin_users():
     return render_template('admin_users.html', users=users)
 @app.route('/admin/leaderboard')
 def admin_leaderboard():
-    # Allow access without login like /admin/users
-    exams = Exam.query.all()
-    leaderboard_data = []
+    try:
+        exams = Exam.query.all()
+        leaderboard_data = []
 
-    for exam in exams:
-        # Get all results for this exam, ordered by score desc and time asc
-        results = ExamResult.query.filter_by(exam_id=exam.id)\
-                    .order_by(ExamResult.score.desc(), ExamResult.completed_at.asc()).all()
+        for exam in exams:
+            # Get all results for this exam ordered by score DESC, then completed_at ASC
+            results = ExamResult.query.filter_by(exam_id=exam.id)\
+                        .order_by(ExamResult.score.desc(), ExamResult.completed_at.asc()).all()
 
-        leaderboard_entries = []
-        rank = 1
-        prev_score = None
-        display_rank = 1
+            # Prepare top 3
+            top_entries = []
+            rank = 1
+            prev_score = None
+            display_rank = 1
+            for i, res in enumerate(results):
+                if prev_score is None or res.score != prev_score:
+                    display_rank = rank
+                if rank > 3:
+                    break
+                top_entries.append({
+                    'rank': display_rank,
+                    'name': res.user.name,
+                    'roll_no': res.user.roll_no,
+                    'score': res.score,
+                    'completed_at': res.completed_at.strftime('%d-%m-%Y %H:%M')
+                })
+                prev_score = res.score
+                rank += 1
 
-        for i, res in enumerate(results):
-            if prev_score is None or res.score != prev_score:
-                display_rank = rank
-            # If same score, same rank as before
+            # Prepare lowest 3 (ordered by score ASC)
+            low_results = sorted(results, key=lambda r: (r.score, r.completed_at))[:3]
+            low_entries = []
+            rank = 1
+            prev_score = None
+            display_rank = 1
+            for i, res in enumerate(low_results):
+                if prev_score is None or res.score != prev_score:
+                    display_rank = rank
+                low_entries.append({
+                    'rank': display_rank,
+                    'name': res.user.name,
+                    'roll_no': res.user.roll_no,
+                    'score': res.score,
+                    'completed_at': res.completed_at.strftime('%d-%m-%Y %H:%M')
+                })
+                prev_score = res.score
+                rank += 1
 
-            leaderboard_entries.append({
-                'rank': display_rank,
-                'name': res.user.name,
-                'roll_number': res.user.roll_number,
-                'score': res.score,
-                'completed_at': res.completed_at.strftime('%Y-%m-%d %H:%M:%S')
+            leaderboard_data.append({
+                'exam': exam,
+                'top_entries': top_entries,
+                'low_entries': low_entries
             })
 
-            prev_score = res.score
-            rank += 1
+        return render_template('admin_leaderboard.html', leaderboard=leaderboard_data)
 
-        leaderboard_data.append({
-            'exam': exam,
-            'entries': leaderboard_entries
-        })
-
-    return render_template('admin_leaderboard.html', leaderboard=leaderboard_data)
+    except Exception as e:
+        import traceback
+        print(traceback.format_exc())
+        return f"An error occurred: {e}", 500
 
 
 @app.route('/admin/logout')
