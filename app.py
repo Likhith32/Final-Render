@@ -84,7 +84,6 @@ class Question(db.Model):
     correct_answer = db.Column(db.String(1), nullable=False)
     marks = db.Column(db.Integer, nullable=False)
 
-
 class ExamResult(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
@@ -94,7 +93,10 @@ class ExamResult(db.Model):
     time_taken = db.Column(db.Integer)
     completed_at = db.Column(db.DateTime, default=datetime.utcnow)
     answers = db.Column(db.Text)
-user = db.relationship('User', backref='results')
+
+    user = db.relationship('User', backref='results')     # Add this
+    exam = db.relationship('Exam', backref='results')     # Optional, useful for convenience
+
 class Admin(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(50), unique=True, nullable=False)
