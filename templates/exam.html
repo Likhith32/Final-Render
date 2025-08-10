@@ -266,62 +266,57 @@
 </form>
 
 <script>
-  let timeRemaining = {{ exam.duration_minutes }} * 60;
-  let answers = {};
-  let currentIndex = 0;
-  const questions = document.querySelectorAll('.question-card');
+let currentQuestionIndex = 0;
+let answers = {};
+let timeRemaining = {{ exam.duration_minutes }} * 60;
 
-  function updateTimer() {
-    const minutes = Math.floor(timeRemaining / 60);
-    const seconds = timeRemaining % 60;
-    document.getElementById('time-display').textContent =
-      ${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')};
-    if (timeRemaining <= 0) {
-      alert("Time's up! Submitting your exam.");
-      submitExam();
-    } else {
-      timeRemaining--;
-    }
+function updateTimer() {
+  const minutes = Math.floor(timeRemaining / 60);
+  const seconds = timeRemaining % 60;
+  document.getElementById('time-display').textContent =
+    `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+  if (timeRemaining <= 0) {
+    alert("Time's up! Submitting your exam.");
+    submitExam();
+  } else {
+    timeRemaining--;
   }
-  setInterval(updateTimer, 1000);
+}
+setInterval(updateTimer, 1000);
 
-  function showQuestion(index) {
-    questions.forEach((q, i) => {
-      q.classList.toggle('active', i === index);
-    });
-  }
+function selectOption(option, questionId) {
+  answers[questionId] = option;
+  updateProgress();
+}
 
-  function nextQuestion() {
-    if (currentIndex < questions.length - 1) {
-      currentIndex++;
-      showQuestion(currentIndex);
-    }
-  }
+function updateProgress() {
+  const answeredCount = Object.keys(answers).length;
+  const totalQuestions = {{ exam.questions|length }};
+  const progress = (answeredCount / totalQuestions) * 100;
+  document.getElementById('progress-bar').style.width = progress + '%';
+  document.getElementById('progress-text').textContent = `${answeredCount} / ${totalQuestions} answered`;
+}
 
-  function prevQuestion() {
-    if (currentIndex > 0) {
-      currentIndex--;
-      showQuestion(currentIndex);
-    }
-  }
-
-  function selectOption(element, questionId, value) {
-    // Highlight selected option
-    const questionCard = element.closest('.question-card');
-    questionCard.querySelectorAll('.option').forEach(opt => opt.classList.remove('selected'));
-    element.classList.add('selected');
-    element.querySelector('input[type="radio"]').checked = true;
-
-    // Save answer
-    answers[questionId] = value;
+function nextQuestion() {
+  const questions = document.querySelectorAll('.question');
+  if (currentQuestionIndex < questions.length - 1) {
+    questions[currentQuestionIndex].style.display = 'none';
+    currentQuestionIndex++;
+    questions[currentQuestionIndex].style.display = 'block';
     updateProgress();
   }
+}
 
-  function updateProgress() {
-    const filled = Object.keys(answers).length;
-    const percent = (filled / questions.length) * 100;
-    document.getElementById('progress-fill').style.width = percent + "%";
+function prevQuestion() {
+  const questions = document.querySelectorAll('.question');
+  if (currentQuestionIndex > 0) {
+    questions[currentQuestionIndex].style.display = 'none';
+    currentQuestionIndex--;
+    questions[currentQuestionIndex].style.display = 'block';
+    updateProgress();
   }
+}
+
 function submitExam() {
   console.log("Submit clicked");
 
@@ -340,7 +335,7 @@ function submitExam() {
   .then(data => {
     if (data.success) {
       console.log("✅ Submitted:", data);
-      window.location.href = /result_summary?score=${data.score}&total=${data.total_marks}&correct=${data.correct}&wrong=${data.wrong};
+      window.location.href = `/result_summary?score=${data.score}&total=${data.total_marks}&correct=${data.correct}&wrong=${data.wrong}`;
     } else {
       console.error("❌ Submit failed:", data.message);
       alert(data.message || 'Submit failed');
