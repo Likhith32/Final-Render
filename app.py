@@ -528,6 +528,15 @@ def reset_password(token):
         return redirect(url_for('login'))
 
     return render_template('reset_password.html', token=token)
+@app.route('/test-mail')
+def test_mail():
+    try:
+        msg = Message("Test Mail", recipients=["your_email@example.com"])
+        msg.body = "This is a test"
+        mail.send(msg)
+        return "Mail sent!"
+    except Exception as e:
+        return f"Mail send failed: {e}"
 
 @app.route('/init_db')
 def init_db_route():
