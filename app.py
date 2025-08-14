@@ -528,6 +528,7 @@ def reset_password(token):
         return redirect(url_for('login'))
 
     return render_template('reset_password.html', token=token)
+
 @app.route('/test-mail')
 def test_mail():
     try:
@@ -555,26 +556,23 @@ def send_reset_email(email, reset_url):
     subject = "🔐 Password Reset Request"
     sender = "likhithmanakala@gmail.com"  # Set your sender email
 
-    # HTML version
     html_body = render_template_string("""
-    ... (HTML template here) ...
+    <!DOCTYPE html>
+    <html>
+      <body>
+        <p>Hello,</p>
+        <p>We received a request to reset your password.</p>
+        <p>Click the link below to reset it:</p>
+        <p><a href="{{ reset_url }}">{{ reset_url }}</a></p>
+        <p>This link will expire in 30 minutes.</p>
+        <p>If you did not request this, please ignore this email.</p>
+        <br>
+        <p>Thanks,<br>Your Website Team</p>
+      </body>
+    </html>
     """, reset_url=reset_url)
 
-    # Plain text version (fallback)
-    text_body = f"""Hello,
-
-We received a request to reset your password.
-
-To reset it, please click the following link:
-{reset_url}
-
-This link will expire in 30 minutes.
-
-If you did not request this, please ignore this email.
-
-Thanks,
-Your Website Team
-"""
+    text_body = f"Reset your password using this link: {reset_url}"
 
     # Send message
     msg = Message(subject, recipients=[email])
