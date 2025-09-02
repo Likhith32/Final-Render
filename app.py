@@ -594,7 +594,7 @@ if __name__ == "__main__":
     with app.app_context():
         db.create_all()
         if not Admin.query.first():
-            admin = Admin(username='admin', password_hash=generate_password_hash('admin123'))
+            admin = Admin(username='likhith', password_hash=generate_password_hash('pravi@23'))
             db.session.add(admin)
             db.session.commit()
 
