@@ -19,7 +19,7 @@ import psycopg2
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'b42322dc0dd4c65d5ef1752d117cce2f'
-app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL')
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://jntu_db_hwva_user:ZAImhZjm1qSzlhK4ao4RfeZzMyRmalLS@dpg-d2rap4je5dus73d2mahg-a.singapore-postgres.render.com/jntu_db_hwva'
 
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['UPLOAD_FOLDER'] = 'static/uploads'
